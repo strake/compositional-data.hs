@@ -16,6 +16,7 @@ library
   hs-source-dirs:      src
   exposed-modules:     Control.Monad.Trans.Fresh
                      , Data.Comp.Equality
+                     , Data.Comp.Show
                      , Data.Comp.Term
   other-modules:       Prelude
   build-depends:       base >= 4.7 && < 5

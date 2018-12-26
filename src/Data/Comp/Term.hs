@@ -5,11 +5,12 @@
 
 module Data.Comp.Term where
 
-import Control.Applicative (Applicative (..))
-import Data.Eq
+import "base" Prelude (($), Show (..), Eq (..), Applicative (..))
+import Unsafe.Coerce
 
 import Control.Monad.Trans.Fresh
 import Data.Comp.Equality
+import Data.Comp.Show
 
 data Cxt (h :: Bool) f a b i where
     In :: f a (Cxt h f a b) i -> Cxt h f a b i
@@ -19,6 +20,9 @@ data Cxt (h :: Bool) f a b i where
 newtype Term f i = Term { unTerm :: ∀ a . Trm f a i }
 
 type Trm f a = Cxt False f a (Const ())
+
+toCxt :: Bifunctor (Dual (NT (->))) (NT (->)) (NT (->)) f => Trm f a i -> Cxt h f a b i
+toCxt = unsafeCoerce
 
 instance Functor (NT (->)) (NT (->)) (f a) => Functor (NT (->)) (NT (->)) (Cxt h f a) where
     map f = NT (\ case
@@ -48,3 +52,12 @@ instance (EqH f, PEq a) => PEq (Cxt h f Name a) where
 
 instance EqH f => Eq (Term f i) where
     Term x == Term y = evalFresh (eqH x y)
+
+instance (Bifunctor (Dual (NT (->))) (NT (->)) (NT (->)) f, ShowH f) => ShowH (Cxt h f) where
+    showH = \ case
+        In   t -> showH (bimap (Dual (id @(NT (->)))) (NT (Const . showH)) `nt` t)
+        Var  v -> pure $ show v
+        Hole x -> getConst x
+
+instance (Bifunctor (Dual (NT (->))) (NT (->)) (NT (->)) f, ShowH f) => Show (Term f i) where
+    show = evalFresh . showH . toCxt . unTerm
