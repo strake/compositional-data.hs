@@ -1,5 +1,5 @@
 name:                compositional-data
-version:             0.1.0.0
+version:             0.1.0.1
 synopsis:            Compositional Data Types
 description:         Modular data types defined as fixpoints, and term homomorphisms, like compdata package but with cleaner API
 license:             BSD3
