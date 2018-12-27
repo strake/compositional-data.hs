@@ -19,7 +19,7 @@ instance Category s => Functor s (->) Name where
 
 instance Show (Name i) where
     show (Name n) = List.genericIndex names n
-      where names = map List.reverse $ flip (:) <$> "":names <*> ['a'..'c']
+      where names = map List.reverse $ flip (:) <$> "":names <*> (['a'..'z'] <|> ['α'..'ω'])
 
 evalFreshT :: FreshT m a -> m a
 evalFreshT = flip runReaderT 0 . unFreshT
